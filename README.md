@@ -1,5 +1,12 @@
-# BitDance: Scaling Autoregressive Generative Models with Binary Tokens 
- 
+<p align="center">
+  <img src="assets/speed.webp" width="90%">
+</p>
+
+<details>
+<summary>
+  <h1 style="display:inline-block">BitDance: Scaling Autoregressive Generative Models with Binary Tokens</h1>
+</summary>
+
 <p align="center">
   <a href="https://bitdance.csuhan.com/">
     <img
@@ -27,9 +34,6 @@
   </a>
 </p>
 
-<p align="center"><img src="assets/speed.webp" width=90%"></p>
-
-
 > [Yuang Ai*](https://shallowdream204.github.io/), [Jiaming Han*](https://csuhan.com/), [Shaobin Zhuang*](https://scholar.google.com/citations?user=PGaDirMAAAAJ), [Weijia Mao](https://scholar.google.com/citations?user=S7bGBmkyNtEC), [Xuefeng Hu](https://xuefenghu.me/), [Ziyan Yang](https://ziyanyang.github.io/), [Zhenheng Yang](https://zhenheny.github.io/), [Huaibo Huang†](https://hhb072.github.io/), [Xiangyu Yue†](https://xyue.io/), [Hao Chen*†‡](https://haochen-rye.github.io/)
 >
 > <sup>*</sup> Equal Contribution&nbsp;&nbsp;<sup>†</sup> Corresponding Author&nbsp;&nbsp;<sup>‡</sup> Project Lead
@@ -37,6 +41,42 @@
 > For visual generation, discrete autoregressive models often struggle with poor tokenizer reconstruction, difficulties in sampling from large vocabularies, and slow token-by-token generation speeds. We present **BitDance**, which addresses these challenges via a large-vocabulary binary tokenizer, a binary diffusion head for sampling in large discrete space, and a next-patch diffusion paradigm that enables efficient multitoken prediction. BitDance is an open-source discrete autoregressive foundation model with 14B parameters, trained on large-scale multimodal tokens. While maintaining the standard language modeling paradigm for text tokens, BitDance employs a next-patch diffusion paradigm for visual tokens to predict multiple tokens in parallel—up to 64 per step. This unified multimodal framework is simple, scalable, and capable of efficiently generating high-resolution, photorealistic images.
 
 <p align="center"><img src="assets/teaser.webp" width="90%"></p>
+
+</details>
+
+<details>
+<summary>
+  <h1 style="display:inline-block">UniWeTok: An Unified Binary Tokenizer with Codebook Size 2¹²⁸</h1>
+</summary>
+
+<p align="center">
+  <a href="https://github.com/shallowdream204/BitDance">
+    <img
+      src="https://img.shields.io/badge/Project-Page-0A66C2?logo=chromewebstore&logoColor=0A66C2"
+      alt="Project Page"
+    />
+  </a>
+  <a href="TBD">
+    <img
+      src="https://img.shields.io/badge/arXiv paper-2602.xxxxx-red?logo=arxiv&logoColor=red"
+      alt="UniWeTok Paper on arXiv"
+    />
+  </a>
+  <a href="TBD">
+    <img 
+        src="https://img.shields.io/badge/Weights-UniWeTok-yellow?logo=huggingface&logoColor=yellow" 
+        alt="UniWeTok Model"
+    />
+  </a>
+</p>
+
+> [Shaobin Zhuang*](https://scholar.google.com/citations?user=PGaDirMAAAAJ), [Yuang Ai*](https://shallowdream204.github.io/), [Jiaming Han*](https://csuhan.com/), [Weijia Mao](https://scholar.google.com/citations?user=S7bGBmkyNtEC), Xiaohui Li, Fangyikang Wang, Xiao Wang, Yan Li, Shanchuan Lin, Kun Xu, [Zhenheng Yang](https://zhenheny.github.io/), [Huaibo Huang](https://hhb072.github.io/), [Xiangyu Yue](https://xyue.io/), [Hao Chen](https://haochen-rye.github.io/), Yali Wang†
+>
+> <sup>*</sup> Equal Contribution&nbsp;&nbsp;<sup>†</sup> Corresponding Author
+>
+> Unified Multimodal Large Language Models (MLLMs) require a visual representation that simultaneously supports high-fidelity reconstruction, complex semantic extraction, and generative suitability. We introduce **UniWeTok**, a unified discrete tokenizer designed to bridge this gap using a massive binary codebook (2¹²⁸). UniWeTok achieves 32x spatial downsampling while maintaining exceptional reconstruction quality. By incorporating Pre-Post Distillation and a Generative-Aware Prior, along with a hybrid convolution-attention architecture and SigLu activation, UniWeTok effectively balances token entropy and commitment loss. It achieves state-of-the-art image generation performance (FID: 1.38) and demonstrates highly competitive capabilities in multimodal understanding and editing tasks.
+
+</details>
 
 ## 🔥 News
 - **2026.2.14**: T2I inference code and models are released.
