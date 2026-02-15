@@ -39,7 +39,8 @@
 <p align="center"><img src="assets/teaser.webp" width="90%"></p>
 
 ## 🔥 News
-- **2026.2.14**: T2I inference code and models are released.
+- **2026.2.15**: We release **UniWeTok**, a unified binary tokenizer with codebook size $2^{128}$ for Unified MLLM. It achieves SOTA generation performance (FID 1.38) and competitive multimodal understanding. Checkout the **[UniWeTok README](README_UniWeTok.md)** for more details!
+- **2026.2.14**: T2I inference code and models for BitDance are released.
 
 
 ## ⚡ Quick Start
