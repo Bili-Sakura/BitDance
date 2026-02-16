@@ -8,11 +8,11 @@ We recommend using the text-to-image generation conda environment. It is compati
 Model | Params | Step-256px | FID  | Huggingface 
 --- |:---:|:---:|:---:|:---:|
 Autoencoder | 460M | - | - |[ae_d16c32.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/ae_d16c32.pt)
-BitDance-B-1X   | 242M | 256 | 1.68 | [BitDance_B_1X.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_1X.pt)
-BitDance-B-4X   | 260M |  64 |1.69 | [BitDance_B_4X.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_4X.pt)
-BitDance-B-16X   | 260M |  16 |1.91 | [BitDance_B_16X.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_16X.pt)
-BitDance-L-1X  | 527M |  256 |1.31 | [BitDance_L_1X.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_L_1X.pt)
-BitDance-H-1X   | 1.0B |  256 |1.24 | [BitDance_H_1X.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_H_1X.pt)
+BitDance-B-1x   | 242M | 256 | 1.68 | [BitDance_B_1x.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_1x.pt)
+BitDance-B-4x   | 260M |  64 |1.69 | [BitDance_B_4x.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_4x.pt)
+BitDance-B-16x   | 260M |  16 |1.91 | [BitDance_B_16x.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_16x.pt)
+BitDance-L-1x  | 527M |  256 |1.31 | [BitDance_L_1x.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_L_1x.pt)
+BitDance-H-1x   | 1.0B |  256 |1.24 | [BitDance_H_1x.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_H_1x.pt)
 
 Run the following script to download all model checkpoints.
 
@@ -23,9 +23,9 @@ hf download shallowdream204/BitDance-ImageNet --local-dir models/BitDance-ImageN
 ## Evaluation
 1️⃣ Sample 50,000 images and save to `.npz`.
 
-BitDance-B-1X:
+BitDance-B-1x:
 ```shell
-ckpt=models/BitDance-ImageNet/BitDance_B_1X.pt
+ckpt=models/BitDance-ImageNet/BitDance_B_1x.pt
 result_path=results
 vae_ckpt=models/BitDance-ImageNet/ae_d16c32.pt
 
@@ -34,9 +34,9 @@ sample_ddp.py --model BitDance-B --latent-dim 32 --trained-vae $vae_ckpt --ckpt 
 --sample-dir $result_path --per-proc-batch-size 384 --to-npz --chunk-size 64
 ```
 
-BitDance-B-4X:
+BitDance-B-4x:
 ```shell
-ckpt=models/BitDance-ImageNet/BitDance_B_4X.pt
+ckpt=models/BitDance-ImageNet/BitDance_B_4x.pt
 result_path=results
 vae_ckpt=models/BitDance-ImageNet/ae_d16c32.pt
 
@@ -45,9 +45,9 @@ sample_ddp_parallel.py --model BitDance-B --latent-dim 32 --trained-vae $vae_ckp
 --sample-dir $result_path --per-proc-batch-size 384 --to-npz --parallel-num 4 --chunk-size 64
 ```
 
-BitDance-B-16X:
+BitDance-B-16x:
 ```shell
-ckpt=models/BitDance-ImageNet/BitDance_B_16X.pt
+ckpt=models/BitDance-ImageNet/BitDance_B_16x.pt
 result_path=results
 vae_ckpt=models/BitDance-ImageNet/ae_d16c32.pt
 
@@ -56,9 +56,9 @@ sample_ddp_parallel.py --model BitDance-B --latent-dim 32 --trained-vae $vae_ckp
 --sample-dir $result_path --per-proc-batch-size 384 --to-npz --parallel-num 16 --chunk-size 64
 ```
 
-BitDance-L-1X:
+BitDance-L-1x:
 ```shell
-ckpt=models/BitDance-ImageNet/BitDance_L_1X.pt
+ckpt=models/BitDance-ImageNet/BitDance_L_1x.pt
 result_path=results
 vae_ckpt=models/BitDance-ImageNet/ae_d16c32.pt
 
@@ -67,9 +67,9 @@ sample_ddp.py --model BitDance-L --latent-dim 32 --trained-vae $vae_ckpt --ckpt 
 --sample-dir $result_path --per-proc-batch-size 352 --to-npz --chunk-size 48
 ```
 
-BitDance-H-1X:
+BitDance-H-1x:
 ```shell
-ckpt=models/BitDance-ImageNet/BitDance_H_1X.pt
+ckpt=models/BitDance-ImageNet/BitDance_H_1x.pt
 result_path=results
 vae_ckpt=models/BitDance-ImageNet/ae_d16c32.pt
 
@@ -86,7 +86,7 @@ sample_ddp.py --model BitDance-H --latent-dim 32 --trained-vae $vae_ckpt --ckpt 
 
 2️⃣ Start training for BitDance.
 
-BitDance-B-1X:
+BitDance-B-1x:
 ```shell
 data_path=/path/to/imagenet/train/
 result_path=results_bitdance_b_1x
@@ -98,7 +98,7 @@ train.py --results-dir $result_path --data-path $data_path --image-size 256 \
 --lr 6e-4 --global-batch-size 1024 --trained-vae $vae_ckpt --ema 0.9999 --perturb-rate 0.1
 ```
 
-BitDance-B-4X:
+BitDance-B-4x:
 ```shell
 data_path=/path/to/imagenet/train/
 result_path=results_bitdance_b_4x
@@ -110,7 +110,7 @@ train_parallel.py --results-dir $result_path --data-path $data_path --image-size
 --lr 6e-4 --global-batch-size 1024 --trained-vae $vae_ckpt --ema 0.9999 --perturb-rate 0.1 --parallel-num 4
 ```
 
-BitDance-B-16X:
+BitDance-B-16x:
 ```shell
 data_path=/path/to/imagenet/train/
 result_path=results_bitdance_b_16x
@@ -123,7 +123,7 @@ train_parallel.py --results-dir $result_path --data-path $data_path --image-size
 ```
 
 
-BitDance-L-1X:
+BitDance-L-1x:
 ```shell
 data_path=/path/to/imagenet/train/
 result_path=results_bitdance_l_1x
@@ -135,7 +135,7 @@ train.py --results-dir $result_path --data-path $data_path --image-size 256 \
 --lr 6e-4 --global-batch-size 1024 --trained-vae $vae_ckpt --ema 0.9999 --perturb-rate 0.05
 ```
 
-BitDance-H-1X:
+BitDance-H-1x:
 ```shell
 data_path=/path/to/imagenet/train/
 result_path=results_bitdance_h_1x

@@ -81,11 +81,11 @@ To reproduce the experiments on ImageNet, check [here](imagenet_gen/README.md) f
 
 Model | Resolution| Params | Step-256px | FID  | Huggingface 
 --- |:---:|:---:|:---:|:---:|:---:|
-BitDance-B-1X | 256x256 | 242M | 256 | 1.68 | [BitDance_B_1X.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_1X.pt)
-BitDance-B-4X   | 256x256 |260M |  64 |1.69 | [BitDance_B_4X.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_4X.pt)
-BitDance-B-16X   | 256x256 |260M |  16 |1.91 | [BitDance_B_16X.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_16X.pt)
-BitDance-L-1X  | 256x256 |527M |  256 |1.31 | [BitDance_L_1X.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_L_1X.pt)
-BitDance-H-1X   | 256x256 |1.0B |  256 |1.24 | [BitDance_H_1X.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_H_1X.pt)
+BitDance-B-1x | 256x256 | 242M | 256 | 1.68 | [BitDance_B_1x.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_1x.pt)
+BitDance-B-4x   | 256x256 |260M |  64 |1.69 | [BitDance_B_4x.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_4x.pt)
+BitDance-B-16x   | 256x256 |260M |  16 |1.91 | [BitDance_B_16x.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_B_16x.pt)
+BitDance-L-1x  | 256x256 |527M |  256 |1.31 | [BitDance_L_1x.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_L_1x.pt)
+BitDance-H-1x   | 256x256 |1.0B |  256 |1.24 | [BitDance_H_1x.pt](https://huggingface.co/shallowdream204/BitDance-ImageNet/blob/main/BitDance_H_1x.pt)
 
 ## ⚡ Quick Start
 
@@ -144,7 +144,7 @@ python app.py
 ```
 
 ## 📸 Evaluation
-1️⃣ We provide the scripts for evaluation on DPG Bench and GenEval. More benchmark evaluation scripts are coming soon.
+We provide the scripts for evaluation on DPG Bench and GenEval. More benchmark evaluation scripts are coming soon.
 
 Evaluation of BitDance-14B-64x Model
 ```bash
