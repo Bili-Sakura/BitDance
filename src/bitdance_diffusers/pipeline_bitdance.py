@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from contextlib import nullcontext
 from typing import List, Optional, Sequence, Tuple, Union
 
-import numpy as np
 import torch
 from einops import rearrange
 from PIL import Image
@@ -65,7 +65,7 @@ class BitDanceDiffusionPipeline(DiffusionPipeline):
         max_resolution = max(max(size) for size in self.supported_image_sizes)
         max_len = max_resolution // self.vae_patch_size
         pos_embed_1d = self._get_1d_sincos_pos_embed(self.hidden_size // 2, max_len)
-        self.register_buffer("pos_embed_1d", pos_embed_1d, persistent=False)
+        self.pos_embed_1d = pos_embed_1d
 
     @staticmethod
     def _get_1d_sincos_pos_embed(dim: int, max_len: int, pe_interpolation: float = 1.0) -> torch.Tensor:
@@ -163,7 +163,6 @@ class BitDanceDiffusionPipeline(DiffusionPipeline):
         device = self._execution_device_fallback()
         model = self.text_encoder.model
         dtype = next(self.text_encoder.parameters()).dtype
-        autocast_dtype = torch.bfloat16 if dtype == torch.bfloat16 else dtype
 
         input_embeds_cond, input_embeds_uncond, _ = self._encode_prompt_to_embeds(
             prompt=prompt,
@@ -173,11 +172,13 @@ class BitDanceDiffusionPipeline(DiffusionPipeline):
         )
         pos_embed_for_diff = self._get_2d_embed(h, w, ps=self.ps).unsqueeze(0).to(device=device, dtype=dtype)
 
-        with torch.amp.autocast(
-            device_type=device.type,
-            enabled=device.type in {"cuda", "cpu"},
-            dtype=autocast_dtype if device.type == "cuda" else None,
-        ):
+        autocast_ctx = (
+            torch.amp.autocast("cuda", enabled=True, dtype=torch.bfloat16)
+            if device.type == "cuda"
+            else nullcontext()
+        )
+
+        with autocast_ctx:
             outputs_c = model(inputs_embeds=input_embeds_cond[:, :-step_width, :], use_cache=True)
             pkv_c = outputs_c.past_key_values
 
@@ -332,7 +333,8 @@ class BitDanceDiffusionPipeline(DiffusionPipeline):
         generator = None
         if seed is not None:
             device = self._execution_device_fallback()
-            generator = torch.Generator(device=device).manual_seed(seed)
+            generator_device = "cuda" if device.type == "cuda" else "cpu"
+            generator = torch.Generator(device=generator_device).manual_seed(seed)
         output = self(
             prompt=prompt,
             height=height,
