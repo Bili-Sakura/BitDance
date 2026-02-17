@@ -104,28 +104,37 @@ hf download shallowdream204/BitDance-14B-64x --local-dir models/BitDance-14B-64x
 hf download shallowdream204/BitDance-14B-16x --local-dir models/BitDance-14B-16x --max-workers=16
 ```
 
-3️⃣ T2I Inference (check [here](modeling/t2i_pipeline.py#L21) for the supported image resolution)
+3️⃣ Convert checkpoints to native Diffusers format (one-time)
+```bash
+python scripts/convert_bitdance_to_diffusers.py \
+  --source_model_path models/BitDance-14B-64x \
+  --output_path models/BitDance-14B-64x-diffusers \
+  --torch_dtype bfloat16
+```
+
+4️⃣ Native Diffusers inference (supported resolutions are in `src/bitdance_diffusers/constants.py`)
 ```python
 # example_t2i.py
-from modeling.t2i_pipeline import BitDanceT2IPipeline
+import torch
+from diffusers import DiffusionPipeline
 
-model_path = 'models/BitDance-14B-64x'
-# model_path = 'models/BitDance-14B-16x'
-device = 'cuda'
-
-pipe = BitDanceT2IPipeline(model_path=model_path, device=device)
+pipe = DiffusionPipeline.from_pretrained(
+    "models/BitDance-14B-64x-diffusers",
+    torch_dtype=torch.bfloat16,
+    trust_remote_code=True,
+).to("cuda")
 
 prompt = "A close-up portrait in a cinematic photography style, capturing a girl-next-door look on a sunny daytime urban street. She wears a khaki sweater, with long, flowing hair gently draped over her shoulders. Her head is turned slightly, revealing soft facial features illuminated by realistic, delicate sunlight coming from the left. The sunlight subtly highlights individual strands of her hair. The image has a Canon film-like color tone, evoking a warm nostalgic atmosphere."
 
-image = pipe.generate(
+image = pipe(
     prompt=prompt,
     height=1024,
     width=1024,
-    num_sampling_steps=50, # adjust to 25 steps for faster inference, but may slightly reduce quality
+    num_inference_steps=50,  # adjust to 25 for faster inference with slightly lower quality
     guidance_scale=7.5,
-    num_images=1,
-    seed=42
-)[0]
+    num_images_per_prompt=1,
+    generator=torch.Generator(device="cuda").manual_seed(42),
+).images[0]
 
 image.save("example.png")
 ```
