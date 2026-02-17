@@ -116,10 +116,16 @@ python scripts/convert_bitdance_to_diffusers.py \
 ```python
 # example_t2i.py
 import torch
+import sys
+from pathlib import Path
 from diffusers import DiffusionPipeline
 
+model_path = Path("models/BitDance-14B-64x-diffusers")
+# The converted folder includes a self-contained runtime package.
+sys.path.insert(0, str(model_path))
+
 pipe = DiffusionPipeline.from_pretrained(
-    "models/BitDance-14B-64x-diffusers",
+    model_path,
     torch_dtype=torch.bfloat16,
     trust_remote_code=True,
 ).to("cuda")

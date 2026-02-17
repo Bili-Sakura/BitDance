@@ -1,11 +1,7 @@
-from pathlib import Path
-import sys
-
 import torch
 from diffusers import DiffusionPipeline
-
-ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT / "src"))
+from pathlib import Path
+import sys
 
 
 # 1) One-time conversion:
@@ -14,8 +10,11 @@ sys.path.insert(0, str(ROOT / "src"))
 #   --output_path models/BitDance-14B-64x-diffusers \
 #   --torch_dtype bfloat16
 
-model_path = "models/BitDance-14B-64x-diffusers"
+model_path = Path("models/BitDance-14B-64x-diffusers")
 device = "cuda"
+
+# Use runtime code bundled by the conversion step.
+sys.path.insert(0, str(model_path))
 
 pipe = DiffusionPipeline.from_pretrained(
     model_path,
