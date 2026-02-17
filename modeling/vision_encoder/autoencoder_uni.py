@@ -384,20 +384,7 @@ class TransformerBlock(nn.Module):
         return out
 
 def precompute_freqs_cis_2d(pos_2d, n_elem: int, base: float = 10000.0, cls_token_num: int = 0):
-    """
-    - pos_2d: [S, 2]，S 为空间 token 数 = H*W
-    - n_elem: 每个 head 的维度 (d_model // n_heads)
-    返回张量形状：[S + cls_token_num, 2, n_elem//4, 2]（cos/sin）
-    解释：
     half_dim = n_elem // 2
-    freqs 长度 = half_dim // 2
-    t.flatten() -> [2S]（x,y 拼在一起）
-    outer -> [2S, half_dim//2]，再 reshape 成 [S(+cls), 2, half_dim//2]
-    最后 stack cos/sin -> [..., 2]
-    """
-    # 注意：完全对齐你给的示例实现
-    half_dim = n_elem // 2
-    # 这里严格遵循示例实现的步长为 2 的采样
     freqs = 1.0 / (
         base ** (torch.arange(0, half_dim, 2, device=pos_2d.device, dtype=pos_2d.dtype)[: (half_dim // 2)] / half_dim)
     )
@@ -468,15 +455,6 @@ class Encoder(nn.Module):
         self.conv_out = nn.Conv2d(block_out, z_channels, kernel_size=(1, 1))
             
     def forward(self, x):
-        """
-        前向流程：
-        1) 下采样 + ResBlocks
-        2) Mid ResBlocks
-        3) (可选) Mid Transformer + 2D RoPE
-        4) 归一化 + swish + 输出卷积
-        5) 映射到 [-1, 1]
-        """
-        # --------- 下采样路径 ----------
         x = self.conv_in(x)
         for i_level in range(self.num_blocks):
             for i_block in range(self.num_res_blocks):
@@ -485,27 +463,21 @@ class Encoder(nn.Module):
             if i_level < self.num_blocks - 1:
                 x = self.down[i_level].downsample(x)
 
-        # --------- Mid Transformer (带 2D RoPE) ----------
         if len(self.mid_attn_blocks) > 0:
-            # 当前特征图尺寸
             B, C, H, W = x.shape
             device = x.device
             dtype = x.dtype
 
-            # 维度检查：确保每个 head 的维度是偶数
             assert hasattr(self, "n_heads"), "Please set self.n_heads = n_heads in __init__."
             assert C % self.n_heads == 0, f"Channel dim {C} must be divisible by n_heads={self.n_heads}"
             head_dim = C // self.n_heads
             assert head_dim % 2 == 0, f"Head dim {head_dim} must be even for 2D RoPE."
 
-            # 展平成 token，顺序为行主序（W 变化最快），与下面 meshgrid 生成一致
             x_tokens = x.flatten(2).transpose(1, 2).contiguous()  # [B, H*W, C]
 
-            # 拼接 register tokens
             reg_tokens = self.register_token.weight.view(1, self.register_num_tokens, C).expand(B, -1, -1)
             x_tokens = torch.cat([reg_tokens, x_tokens], dim=1)  # [B, reg + H*W, C]
 
-            # 根据 H×W 生成 2D 位置坐标（中心坐标 0.5, 1.5, ..., size-0.5）
             y_centers = torch.arange(H, device=device, dtype=dtype)
             y_centers *= 7.0 / y_centers[-1]
             y_centers += 0.5
@@ -515,25 +487,20 @@ class Encoder(nn.Module):
             grid_y, grid_x = torch.meshgrid(y_centers, x_centers, indexing="ij")  # [H, W]
             pos_2d = torch.stack([grid_x.reshape(-1), grid_y.reshape(-1)], dim=1)  # [H*W, 2]
 
-            # 预计算 2D RoPE 频率（包含 register tokens 的占位）
             freqs_cis = precompute_freqs_cis_2d(
                 pos_2d,
                 head_dim,
-                base=10000.0,  # 与示例一致
+                base=10000.0,
                 cls_token_num=self.register_num_tokens,
             ).to(device=device, dtype=dtype)
 
-            # 逐层 Transformer
             for block in self.mid_attn_blocks:
                 x_tokens = block(x_tokens, freqs_cis)
 
-            # 去掉 register tokens
             x_tokens = x_tokens[:, self.register_num_tokens:, :]  # [B, H*W, C]
 
-            # 还原回 NCHW
             x = x_tokens.transpose(1, 2).contiguous().view(B, C, H, W)
 
-        # --------- 输出头 ----------
         x = self.norm_out(x)
         # x = swish(x)
         x = self.conv_out(x)
@@ -556,7 +523,6 @@ class GANDecoder(nn.Module):
             z_channels * 2, block_in, kernel_size=(3, 3), padding=1, bias=True
         )
 
-        # 与 Encoder 一致的 Transformer 设置
         self.n_heads = n_heads
         self.register_num_tokens = 4
         self.register_token = nn.Embedding(self.register_num_tokens, block_in)
@@ -610,39 +576,38 @@ class GANDecoder(nn.Module):
         z = torch.cat([z, noise], dim=1) #concat noise to the style vector
         z = self.conv_in(z)
 
-        # Mid Transformer（与 Encoder 一致的 2D RoPE）
         if len(self.mid_attn_blocks) > 0:
             B, C, H, W = z.shape
             device = z.device
             dtype = z.dtype
-            # 维度校验：每个 head 的维度须为偶数
+
             assert hasattr(self, "n_heads"), "Please set self.n_heads = n_heads in __init__."
             assert C % self.n_heads == 0, f"Channel dim {C} must be divisible by n_heads={self.n_heads}"
             head_dim = C // self.n_heads
             assert head_dim % 2 == 0, f"Head dim {head_dim} must be even for 2D RoPE."
-            # NCHW -> NLC（行主序展平，与位置编码网格一致）
+
             tokens = z.flatten(2).transpose(1, 2).contiguous()  # [B, H*W, C]
-            # 拼接 register tokens
+
             reg_tokens = self.register_token.weight.view(1, self.register_num_tokens, C).expand(B, -1, -1)
             tokens = torch.cat([reg_tokens, tokens], dim=1)  # [B, reg + H*W, C]
-            # 构建 2D 网格坐标（中心坐标），并做与 Encoder 相同的尺度归一（7.5）
+
             y_centers = torch.arange(H, device=device, dtype=dtype) + 0.5
             y_centers *= 7.5 / y_centers[-1]
             x_centers = torch.arange(W, device=device, dtype=dtype) + 0.5
             x_centers *= 7.5 / x_centers[-1]
             grid_y, grid_x = torch.meshgrid(y_centers, x_centers, indexing="ij")  # [H, W]
             pos_2d = torch.stack([grid_x.reshape(-1), grid_y.reshape(-1)], dim=1)  # [H*W, 2]
-            # 预计算 2D RoPE 频率表（包含 register tokens 的占位）
+
             freqs_cis = precompute_freqs_cis_2d(
                 pos_2d,
                 head_dim,
                 base=10000.0,
                 cls_token_num=self.register_num_tokens,
             ).to(device=device, dtype=dtype)
-            # 逐层 Transformer
+
             for block in self.mid_attn_blocks:
                 tokens = block(tokens, freqs_cis)
-            # 去掉 register tokens 并还原回 NCHW
+
             tokens = tokens[:, self.register_num_tokens:, :]  # [B, H*W, C]
             z = tokens.transpose(1, 2).contiguous().view(B, C, H, W)
 

@@ -39,9 +39,8 @@
 <p align="center"><img src="assets/teaser_v2.webp" width="80%"></p>
 
 ## 🔥 News
-- **2026.2.15**: We release **UniWeTok**, An Unified Binary Tokenizer with Codebook Size $\mathit{2^{128}}$ for Unified Multimodal Large Language Model. Checkout the **[UniWeTok README](README_UniWeTok.md)** for more details!
-- **2026.2.15**: Code and models for class conditional generation on ImageNet are released! Check [here](imagenet_gen/README.md) for details.
-- **2026.2.14**: Text-to-image inference code and models are released!
+- **2026.2.17**: We release **UniWeTok**, An Unified Binary Tokenizer with Codebook Size $\mathit{2^{128}}$ for Unified Multimodal Large Language Model. Checkout the **[UniWeTok README](README_UniWeTok.md)** for more details!
+- **2026.2.17**: We released the [website](https://bitdance.csuhan.com/), [demo](https://huggingface.co/spaces/shallowdream204/BitDance-14B-64x), [model](https://huggingface.co/collections/shallowdream204/bitdance), and [paper](https://arxiv.org/abs/2602.14041) for BitDance.
 
 
 
